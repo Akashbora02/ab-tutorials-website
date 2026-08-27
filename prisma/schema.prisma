@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -56,9 +56,9 @@ model Test {
   title           String
   subject         String           // "Mathematics", "Science"
   class           String           // "8th", "9th", "10th"
-  durationMinutes Int              @default(30)
-  totalMarks      Int              @default(20)
-  passingMarks    Int              @default(8)
+  durationMinutes Int              @default(20)
+  totalMarks      Int              @default(12)
+  passingMarks    Int              @default(5)
   description     String?
   difficulty      String           @default("Medium") // "Easy", "Medium", "Hard"
   isPublished     Boolean          @default(true)
