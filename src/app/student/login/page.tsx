@@ -116,7 +116,6 @@ export default function StudentLoginPage() {
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold focus:ring-2 focus:ring-blue-500 focus:outline-hidden tracking-widest"
               />
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">Default PIN is <strong>1234</strong></p>
           </div>
 
           <button

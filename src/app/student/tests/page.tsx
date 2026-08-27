@@ -51,16 +51,24 @@ function TestCatalogContent() {
       if (stored) {
         const parsed = JSON.parse(stored);
         setStudentUser(parsed);
-        // If student is logged in, restrict to THEIR class!
+        
+        // Strict class assignment for logged in student
         if (parsed.class) {
-          setSelectedClass(parsed.class);
+          const cleanCls = parsed.class === '7th' ? '8th' : parsed.class;
+          setSelectedClass(cleanCls);
+
           if (parsed.subjects === 'Mathematics Only') {
             setSelectedSubject('Mathematics');
           } else if (parsed.subjects === 'Science Only') {
             setSelectedSubject('Science');
+          } else {
+            setSelectedSubject('ALL');
           }
+          return;
         }
-      } else if (queryClass && queryClass !== 'ALL') {
+      }
+
+      if (queryClass && queryClass !== 'ALL') {
         setSelectedClass(queryClass === '7th' ? '8th' : queryClass);
       }
     } catch (e) {
@@ -70,14 +78,26 @@ function TestCatalogContent() {
 
   useEffect(() => {
     fetchTests();
-  }, [selectedClass, selectedSubject]);
+  }, [selectedClass, selectedSubject, studentUser]);
 
   const fetchTests = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (selectedClass !== 'ALL') params.append('class', selectedClass);
-      if (selectedSubject !== 'ALL') params.append('subject', selectedSubject);
+
+      // If student is logged in, ALWAYS enforce their class
+      const effectiveClass = studentUser?.class || selectedClass;
+      if (effectiveClass && effectiveClass !== 'ALL') {
+        params.append('class', effectiveClass);
+      }
+
+      const effectiveSubject = selectedSubject !== 'ALL' ? selectedSubject : (
+        studentUser?.subjects === 'Mathematics Only' ? 'Mathematics' :
+        studentUser?.subjects === 'Science Only' ? 'Science' : 'ALL'
+      );
+      if (effectiveSubject && effectiveSubject !== 'ALL') {
+        params.append('subject', effectiveSubject);
+      }
 
       const res = await fetch(`/api/tests?${params.toString()}`);
       const data = await res.json();
@@ -114,6 +134,23 @@ function TestCatalogContent() {
     // If logged in, proceed to exam
     router.push(`/student/tests/${test.id}`);
   };
+
+  // Client-side strict filter to guarantee 0% bleed of tests from other classes
+  const displayTests = tests.filter((test) => {
+    if (studentUser && studentUser.class) {
+      const sClass = studentUser.class.replace(/[^0-9]/g, '');
+      const tClass = (test.class || '').replace(/[^0-9]/g, '');
+      if (sClass && tClass && sClass !== tClass) return false;
+
+      if (studentUser.subjects === 'Mathematics Only' && test.subject !== 'Mathematics') {
+        return false;
+      }
+      if (studentUser.subjects === 'Science Only' && test.subject !== 'Science') {
+        return false;
+      }
+    }
+    return true;
+  });
 
   return (
     <>
@@ -179,7 +216,7 @@ function TestCatalogContent() {
                 </span>
               </div>
               <p className="text-xs text-blue-200 mt-0.5">
-                Roll No: <strong className="font-mono text-white">{studentUser.rollNo}</strong> • Showing only exams assigned to your standard
+                Roll No: <strong className="font-mono text-white">{studentUser.rollNo}</strong> • Enrolled: <strong className="text-amber-300">{studentUser.subjects || 'Mathematics & Science'}</strong>
               </p>
             </div>
           </div>
@@ -193,7 +230,7 @@ function TestCatalogContent() {
             </Link>
             <button
               onClick={handleLogout}
-              className="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold rounded-xl text-xs transition border border-rose-500/30 flex items-center gap-1"
+              className="px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold rounded-xl text-xs transition border border-rose-500/30 flex items-center gap-1 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Switch User</span>
@@ -225,10 +262,38 @@ function TestCatalogContent() {
         </div>
       )}
 
-      {/* Filters Section (Only shown if open view) */}
+      {/* Subject Filter (For enrolled students who take both Math & Science) */}
+      {studentUser && studentUser.subjects === 'Mathematics & Science' && (
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs mb-8 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5" /> Filter My Class {studentUser.class} Tests:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'ALL', label: 'All Subjects (Math & Science)' },
+              { id: 'Mathematics', label: 'Mathematics Only', icon: <Calculator className="w-3.5 h-3.5" /> },
+              { id: 'Science', label: 'Science Only', icon: <Atom className="w-3.5 h-3.5" /> },
+            ].map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedSubject(s.id)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  selectedSubject === s.id
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {s.icon}
+                <span>{s.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Public Filters Section (Only shown if NOT logged in) */}
       {!studentUser && (
-        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm mb-10 space-y-4">
-          
+        <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs mb-10 space-y-4">
           {/* Class Filter */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
@@ -244,7 +309,7 @@ function TestCatalogContent() {
                 <button
                   key={c.id}
                   onClick={() => setSelectedClass(c.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                     selectedClass === c.id
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -270,7 +335,7 @@ function TestCatalogContent() {
                 <button
                   key={s.id}
                   onClick={() => setSelectedSubject(s.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     selectedSubject === s.id
                       ? 'bg-slate-900 text-white shadow-md'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -282,7 +347,6 @@ function TestCatalogContent() {
               ))}
             </div>
           </div>
-
         </div>
       )}
 
@@ -292,17 +356,19 @@ function TestCatalogContent() {
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
           <p className="text-xs text-slate-400 mt-3 font-medium">Loading Assessment Series...</p>
         </div>
-      ) : tests.length === 0 ? (
+      ) : displayTests.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-lg mx-auto space-y-4">
           <BookOpen className="w-12 h-12 text-slate-300 mx-auto" />
           <h3 className="text-lg font-bold text-slate-800">No Tests Found for Selected Filters</h3>
           <p className="text-xs text-slate-500">
-            No active tests found matching your class and subject. Try selecting another filter or contact Prof. Akshay Bora.
+            {studentUser 
+              ? `No active tests currently assigned for Class ${studentUser.class} (${studentUser.subjects}).`
+              : 'No active tests found matching your class and subject filter.'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tests.map((test) => (
+          {displayTests.map((test) => (
             <div
               key={test.id}
               className="bg-white rounded-3xl p-7 border border-slate-200 shadow-md hover:shadow-xl transition-all flex flex-col justify-between"
@@ -335,7 +401,7 @@ function TestCatalogContent() {
                     <div className="text-[10px] text-slate-400">Questions</div>
                   </div>
                   <div className="bg-slate-50 p-2 rounded-xl">
-                    <div className="font-bold text-slate-800">{test.durationMinutes}m</div>
+                    <div className="font-bold text-slate-800">{test.durationMinutes || 20}m</div>
                     <div className="text-[10px] text-slate-400">Duration</div>
                   </div>
                   <div className="bg-slate-50 p-2 rounded-xl">

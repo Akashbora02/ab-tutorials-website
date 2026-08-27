@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     if (pin && student.pin && student.pin !== pin) {
       return NextResponse.json(
-        { success: false, error: 'Incorrect 4-digit Student PIN. Default PIN is 1234.' },
+        { success: false, error: 'Incorrect 4-digit Student PIN. Please check and try again.' },
         { status: 401 }
       );
     }
