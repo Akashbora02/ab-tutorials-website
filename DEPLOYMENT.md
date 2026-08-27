@@ -1,79 +1,33 @@
-# Complete Vercel Deployment Guide for AB Tutorials
+# Vercel Deployment Guide for AB Tutorials
 
-This guide provides clear, step-by-step instructions to host the **AB Tutorials** full-stack web application on **Vercel** with zero downtime.
-
----
-
-## 📋 Institute Contact & Standards Defaults
-- **Target Standards:** **Classes 8th, 9th, and 10th (Science & Mathematics)**
-- **Admin Email:** `akshaybora82@gmail.com`
-- **Phone / WhatsApp:** `+91 98907 24002` (`9890724002`)
-- **Center Location:** `Rajuri, Tal-Rahata, Dist-Ahilyanagar, 413737`
-- **Facebook:** `https://www.facebook.com/akshay.bora1122`
-- **Instagram:** `https://www.instagram.com/tr_akshay_bora/`
+Follow this step-by-step guide to deploy your Next.js application to Vercel with a production-ready database.
 
 ---
 
-## 🚀 Method 1: Deploy with GitHub + Vercel (Recommended)
+## 📋 Prerequisites
+1. Your code is pushed to GitHub: [https://github.com/Akashbora02/ab-tutorials](https://github.com/Akashbora02/ab-tutorials) (✅ **Done**).
+2. A free [Vercel](https://vercel.com) account.
+3. A free cloud PostgreSQL database (from [Neon](https://neon.tech), [Supabase](https://supabase.com), or [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)).
 
-### Step 1: Push Code to GitHub
-1. Open your terminal in the project directory:
-   ```bash
-   cd ab-tutorials
-   git init
-   git add .
-   git commit -m "feat: AB Tutorials Full-Stack Platform for 8th-10th Classes"
-   ```
-2. Create a new repository on [GitHub](https://github.com/new) named `ab-tutorials`.
-3. Push your code:
-   ```bash
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/ab-tutorials.git
-   git push -u origin main
+---
+
+## 🚀 Step-by-Step Deployment
+
+### Step 1: Set Up Free Cloud PostgreSQL Database
+Vercel functions run in a serverless environment where SQLite files are read-only and ephemeral. A cloud PostgreSQL database provides persistent data for students, admissions, and test results:
+
+1. Sign up for a free account at **[Neon.tech](https://neon.tech)** (takes 30 seconds).
+2. Create a new project called `ab-tutorials`.
+3. Copy the **Direct Connection String** or **Pooled Connection String** provided by Neon:
+   ```env
+   DATABASE_URL="postgresql://neondb_owner:YOUR_PASSWORD@ep-xyz.us-east-2.aws.neon.tech/neondb?sslmode=require"
    ```
 
 ---
 
-### Step 2: Import into Vercel
-1. Log into your [Vercel Dashboard](https://vercel.com/dashboard).
-2. Click **"Add New..."** &rarr; **"Project"**.
-3. Select your `ab-tutorials` GitHub repository and click **Import**.
-4. In the Project Configuration:
-   - **Framework Preset:** `Next.js`
-   - **Root Directory:** `./`
+### Step 2: Configure Database Provider in `prisma/schema.prisma`
+In your codebase, ensure the `datasource` block in `prisma/schema.prisma` uses `postgresql`:
 
----
-
-### Step 3: Configure Cloud Database & Environment Variables
-
-Because Vercel serverless functions are stateless, production database data requires a cloud PostgreSQL database:
-
-#### Option A: Use Neon Serverless PostgreSQL (Takes 1 minute)
-1. Go to [neon.tech](https://neon.tech) and create a free PostgreSQL database.
-2. Copy the Connection String URI (e.g., `postgres://user:pass@ep-xyz.neon.tech/neondb?sslmode=require`).
-
-#### Option B: Use Vercel Postgres / Storage
-1. In your Vercel Project Dashboard, click the **"Storage"** tab.
-2. Click **"Create Database"** &rarr; **"Postgres"**.
-3. Accept default settings and click **"Create & Link"**.
-
-#### Set Environment Variables in Vercel:
-In Vercel Dashboard &rarr; **Settings** &rarr; **Environment Variables**, add:
-| Key | Value | Description |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | `postgresql://...` (your cloud Postgres URI) | Database Connection URI |
-| `ADMIN_USERNAME` | `admin` | Admin panel login |
-| `ADMIN_PASSWORD` | `YourSecurePassword123` | Admin panel password |
-| `NEXT_PUBLIC_APP_NAME` | `AB Tutorials` | Institute Name |
-| `NEXT_PUBLIC_PHONE` | `+91 98907 24002` | Contact phone |
-| `NEXT_PUBLIC_WHATSAPP` | `9890724002` | WhatsApp number |
-| `NEXT_PUBLIC_EMAIL` | `akshaybora82@gmail.com` | Official Email |
-| `NEXT_PUBLIC_ADDRESS` | `Rajuri, Tal-Rahata, Dist-Ahilyanagar, 413737` | Location |
-
----
-
-### Step 4: Build & Database Push
-In `prisma/schema.prisma`, when switching to PostgreSQL in production, set:
 ```prisma
 datasource db {
   provider = "postgresql"
@@ -81,20 +35,34 @@ datasource db {
 }
 ```
 
-In your Vercel project settings, set the **Build Command** to:
+Push this schema to your Neon database locally:
 ```bash
-prisma generate && next build
+DATABASE_URL="your_neon_url" pnpm prisma db push
+DATABASE_URL="your_neon_url" pnpm prisma db seed
 ```
 
 ---
 
-### Step 5: Deploy!
-Click **"Deploy"**. Vercel will build your application, generate the optimized pages, and deploy to your custom `.vercel.app` domain in seconds!
+### Step 3: Deploy Project on Vercel
+1. Go to **[https://vercel.com/new](https://vercel.com/new)**.
+2. Select **`Akashbora02/ab-tutorials`** and click **Import**.
+3. In the configuration screen:
+   - **Framework Preset**: Next.js (detected automatically)
+   - **Root Directory**: `./` (leave default)
+   - **Build Command**: `pnpm build` (or `npx prisma generate && next build`)
+   - **Output Directory**: `.next`
+4. Expand **Environment Variables** and add:
+   | Key | Value |
+   | :--- | :--- |
+   | `DATABASE_URL` | *Paste your Neon PostgreSQL URL* |
+   | `ADMIN_USERNAME` | `admin` |
+   | `ADMIN_PASSWORD` | `admin123` |
+5. Click **"Deploy"**!
 
 ---
 
-## 🛡️ Default Credentials for Production
-- **Admin URL:** `https://your-domain.vercel.app/admin/login`
-- **Username:** `admin`
-- **Password:** `admin123` (or custom value in `ADMIN_PASSWORD` env)
-- **Student Demo Roll Numbers:** `AB-1001`, `AB-1002`, `AB-901`, `AB-801` (PIN: `1234`)
+### Step 4: Verify Deployment
+Once Vercel finishes building (usually in ~60 seconds):
+- Your production URL will be live (e.g. `https://ab-tutorials-akashbora02.vercel.app`).
+- Test student online admission, CBT examination portal, and the private admin dashboard.
+- Any new commits pushed to `main` will automatically trigger a Vercel production deployment!
