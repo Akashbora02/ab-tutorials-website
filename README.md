@@ -57,8 +57,8 @@
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Akashbora02/ab-tutorials.git
-cd ab-tutorials
+git clone https://github.com/Akashbora02/ab-tutorials-website.git
+cd ab-tutorials-website
 
 # 2. Install dependencies
 pnpm install # or npm install / yarn
@@ -85,18 +85,14 @@ Because Vercel is a serverless platform with read-only file systems in productio
 
 ### Step 2: Push to GitHub
 ```bash
-git init
-git add .
-git commit -m "Initial commit of AB Tutorials Full Stack Platform"
-git branch -M main
-git remote add origin https://github.com/Akashbora02/ab-tutorials.git
+git remote set-url origin https://github.com/Akashbora02/ab-tutorials-website.git
 git push -u origin main
 ```
 
 ### Step 3: Deploy on Vercel
 1. Log in to [Vercel.com](https://vercel.com) with your GitHub account.
 2. Click **"Add New"** &rarr; **"Project"**.
-3. Import the `Akashbora02/ab-tutorials` repository.
+3. Import the `Akashbora02/ab-tutorials-website` repository.
 4. In **Environment Variables**, add:
    - `DATABASE_URL`: *Your cloud PostgreSQL connection string*
    - `ADMIN_USERNAME`: `admin`
