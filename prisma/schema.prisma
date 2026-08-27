@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  name      String   @default("Prof. Akshay Bora")
+  email     String   @default("akshaybora82@gmail.com")
+  createdAt DateTime @default(now())
+}
+
+model Student {
+  id          String   @id @default(cuid())
+  rollNo      String   @unique
+  name        String
+  email       String?
+  phone       String
+  class       String   // "8th", "9th", "10th"
+  subjects    String   @default("Mathematics & Science")
+  parentName  String?
+  parentPhone String?
+  address     String?
+  pin         String   @default("1234") // Simple 4-digit PIN for quick student login
+  status      String   @default("Active") // "Active", "Inactive"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdmissionEnquiry {
+  id                 String   @id @default(cuid())
+  studentName        String
+  parentName         String
+  email              String?
+  phone              String
+  targetClass        String   // "8th", "9th", "10th"
+  subjects           String   @default("Mathematics & Science") // "Mathematics & Science", "Mathematics Only", "Science Only"
+  schoolName         String?
+  previousPercentage String?
+  preferredBatch     String?  // "Morning (8:00 AM - 10:00 AM)", "Evening (4:30 PM - 6:30 PM)", "Evening (6:30 PM - 8:30 PM)"
+  message            String?
+  status             String   @default("NEW") // "NEW", "CONTACTED", "COUNSELING", "ENROLLED", "REJECTED"
+  staffNotes         String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Test {
+  id              String           @id @default(cuid())
+  title           String
+  subject         String           // "Mathematics", "Science"
+  class           String           // "8th", "9th", "10th"
+  durationMinutes Int              @default(30)
+  totalMarks      Int              @default(20)
+  passingMarks    Int              @default(8)
+  description     String?
+  difficulty      String           @default("Medium") // "Easy", "Medium", "Hard"
+  isPublished     Boolean          @default(true)
+  questions       Question[]
+  submissions     TestSubmission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  testId        String
+  test          Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String   // "A", "B", "C", "D"
+  explanation   String?
+  marks         Int      @default(2)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+
+model TestSubmission {
+  id               String   @id @default(cuid())
+  studentId        String?  // Can be anonymous/guest or registered student ID
+  studentName      String
+  studentRollNo    String?
+  studentClass     String   // "8th", "9th", "10th"
+  testId           String
+  test             Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  score            Int
+  totalMarks       Int
+  percentage       Float
+  timeTakenSeconds Int
+  answersJson      String   // JSON string of { questionId: selectedOption }
+  isPassed         Boolean
+  submittedAt      DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
