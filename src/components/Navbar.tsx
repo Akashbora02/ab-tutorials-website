@@ -9,8 +9,7 @@ import {
   Phone, 
   MessageSquare, 
   UserCircle2, 
-  Sparkles,
-  MapPin
+  Sparkles
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -34,17 +33,17 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-xs">
       
-      {/* Top Notice Bar (Solid Opaque Deep Slate) */}
-      <div className="bg-slate-950 text-white text-xs py-2 px-4 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      {/* Top Notice Bar */}
+      <div className="bg-slate-950 text-white text-xs py-2 px-3 sm:px-4 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-1.5 sm:gap-2">
           
-          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-            <span className="bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded text-[10px] tracking-wide uppercase shadow-xs whitespace-nowrap">
-              Admissions Open 2026-27
+          <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start text-center md:text-left">
+            <span className="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded text-[10px] tracking-wide uppercase shadow-xs shrink-0">
+              Admissions 2026-27
             </span>
-            <span className="text-slate-200 text-xs font-medium whitespace-nowrap">
+            <span className="text-slate-200 text-xs font-medium">
               Classes 8th, 9th & 10th (Science & Maths) • Rajuri (Near New Talathi Office), India
             </span>
           </div>
@@ -54,14 +53,14 @@ export default function Navbar() {
               href="https://wa.me/919890724002?text=Hello%20Prof.%20Akshay%20Bora,%20I%20am%20interested%20in%20AB%20Tutorials%20Admission" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition whitespace-nowrap"
+              className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition"
             >
               <MessageSquare className="w-3.5 h-3.5" />
               <span>WhatsApp</span>
             </a>
             <a 
               href="tel:+919890724002" 
-              className="flex items-center gap-1.5 text-amber-300 hover:text-amber-200 transition font-mono whitespace-nowrap"
+              className="flex items-center gap-1 text-amber-300 hover:text-amber-200 transition font-mono"
             >
               <Phone className="w-3.5 h-3.5" />
               <span>+91 98907 24002</span>
@@ -71,38 +70,38 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navbar (Solid Opaque Pure White) */}
+      {/* Main Navbar */}
       <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-18 sm:h-20">
           
           {/* Brand Logo & Slogan */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm border border-slate-200 p-1 group-hover:scale-105 transition-transform overflow-hidden shrink-0">
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white flex items-center justify-center shadow-xs border border-slate-200 p-1 group-hover:scale-105 transition-transform overflow-hidden shrink-0">
               <img 
                 src="/images/logo.png" 
                 alt="AB Tutorials Logo" 
                 className="w-full h-full object-contain"
               />
             </div>
-            <div className="shrink-0">
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950 block leading-tight">
+            <div className="truncate">
+              <span className="text-lg sm:text-2xl font-black tracking-tight text-slate-950 block leading-tight">
                 AB <span className="text-blue-600">Tutorials</span>
               </span>
-              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 whitespace-nowrap leading-none mt-0.5">
+              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 truncate leading-none mt-0.5">
                 Building strong foundation for student success
               </p>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links (Always Solid & Bold) */}
-          <nav className="hidden xl:flex items-center gap-2">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden xl:flex items-center gap-1.5 lg:gap-2">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`px-3 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                     isActive
                       ? 'text-blue-600 bg-blue-50/90 shadow-xs'
                       : 'text-slate-800 hover:text-blue-600 hover:bg-slate-50'
@@ -137,10 +136,10 @@ export default function Navbar() {
           <div className="flex items-center gap-2 xl:hidden">
             <Link
               href="/student/login"
-              className="px-3 py-1.5 text-blue-600 bg-blue-50 rounded-xl text-xs font-bold flex items-center gap-1 border border-blue-200 whitespace-nowrap"
+              className="px-2.5 py-1.5 text-blue-600 bg-blue-50 rounded-xl text-xs font-bold flex items-center gap-1 border border-blue-200"
             >
-              <UserCircle2 className="w-3.5 h-3.5" />
-              <span>Portal</span>
+              <UserCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden xs:inline">Portal</span>
             </Link>
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -154,9 +153,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Responsive Mobile Drawer Menu (Solid Opaque White) */}
+      {/* Responsive Mobile Drawer Menu */}
       {isOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-2 shadow-2xl">
+        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-2 shadow-2xl animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -164,7 +163,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2.5 rounded-xl text-sm font-bold ${
+                className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition ${
                   isActive
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50'

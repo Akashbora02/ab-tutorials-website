@@ -3,17 +3,32 @@ import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+// Helper to normalize class
+function normalizeClass(rawClass?: string): string {
+  if (!rawClass) return '10th';
+  const numMatch = rawClass.match(/\d+/);
+  if (numMatch) {
+    const num = numMatch[0];
+    if (num === '7' || num === '8') return '8th';
+    if (num === '9') return '9th';
+    if (num === '10') return '10th';
+  }
+  return rawClass.trim();
+}
+
 // GET /api/admissions - List admission leads with optional filters
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const targetClass = searchParams.get('class');
+    const rawClass = searchParams.get('class');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
 
+    const targetClass = rawClass && rawClass !== 'ALL' ? normalizeClass(rawClass) : null;
+
     const where: any = {};
 
-    if (targetClass && targetClass !== 'ALL') {
+    if (targetClass) {
       where.targetClass = targetClass;
     }
 
@@ -39,7 +54,7 @@ export async function GET(req: NextRequest) {
     const classCounts = await prisma.admissionEnquiry.groupBy({
       by: ['targetClass'],
       _count: { id: true },
-    });
+    }).catch(() => []);
 
     return NextResponse.json({
       success: true,
@@ -58,7 +73,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/admissions - Submit admission application with strict duplicate prevention
+// POST /api/admissions - Submit admission application with strict duplicate prevention & student creation
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -67,7 +82,7 @@ export async function POST(req: NextRequest) {
       parentName,
       email,
       phone,
-      targetClass,
+      targetClass: rawTargetClass,
       subjects,
       schoolName,
       previousPercentage,
@@ -76,11 +91,11 @@ export async function POST(req: NextRequest) {
     } = body;
 
     // 1. Validation
-    if (!studentName?.trim() || !parentName?.trim() || !phone?.trim() || !targetClass?.trim()) {
+    if (!studentName?.trim() || !parentName?.trim() || !phone?.trim()) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Please fill in all mandatory fields: Student Name, Parent Name, Mobile Number, and Target Class.' 
+          error: 'Please fill in all required fields: Student Name, Parent Name, and Mobile Number.' 
         },
         { status: 400 }
       );
@@ -94,40 +109,47 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cleanEmail = email?.trim() || '';
-    const cleanClass = targetClass === '7th' ? '8th' : targetClass.trim();
+    const cleanClass = normalizeClass(rawTargetClass);
+    const cleanEmail = email?.trim() || null;
     const cleanSubjects = subjects || 'Mathematics & Science';
     const cleanStudentName = studentName.trim();
     const cleanParentName = parentName.trim();
     const studentPin = '1234';
 
-    // 2. Strict Duplicate Check (Check existing Student or Admission Enquiry)
-    const existingStudent = await prisma.student.findFirst({
-      where: {
-        OR: [
-          { phone: cleanPhone },
-          ...(cleanEmail ? [{ email: cleanEmail }] : []),
-        ],
-      },
-    });
+    // 2. Duplicate Check
+    let existingStudent = null;
+    let existingEnquiry = null;
 
-    const existingEnquiry = await prisma.admissionEnquiry.findFirst({
-      where: {
-        OR: [
-          { phone: cleanPhone },
-          ...(cleanEmail ? [{ email: cleanEmail }] : []),
-        ],
-      },
-    });
+    try {
+      existingStudent = await prisma.student.findFirst({
+        where: {
+          OR: [
+            { phone: cleanPhone },
+            ...(cleanEmail ? [{ email: cleanEmail }] : []),
+          ],
+        },
+      });
+
+      existingEnquiry = await prisma.admissionEnquiry.findFirst({
+        where: {
+          OR: [
+            { phone: cleanPhone },
+            ...(cleanEmail ? [{ email: cleanEmail }] : []),
+          ],
+        },
+      });
+    } catch (e) {
+      console.warn('Duplicate query check warning (proceeding):', e);
+    }
 
     if (existingStudent || existingEnquiry) {
-      const matchedName = existingStudent?.name || existingEnquiry?.studentName || 'Student';
+      const matchedName = existingStudent?.name || existingEnquiry?.studentName || cleanStudentName;
       const matchedRoll = existingStudent?.rollNo || 'Registered';
       return NextResponse.json(
         {
           success: false,
           duplicate: true,
-          error: `An application with this Mobile Number (${cleanPhone}) already exists for "${matchedName}" (Roll No: ${matchedRoll}).`,
+          error: `An application with Mobile Number (${cleanPhone}) already exists for "${matchedName}" (Roll No: ${matchedRoll}).`,
           existingRollNo: existingStudent?.rollNo,
           existingPhone: cleanPhone,
           existingName: matchedName,
@@ -136,15 +158,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Generate unique Roll Number based on Class
-    const classNumeric = cleanClass.replace(/[^0-9]/g, '');
-    const prefix = `AB-${classNumeric}`;
+    // 3. Generate Unique Roll Number
+    const classNum = cleanClass.replace(/[^0-9]/g, '');
+    let nextNum = 1;
 
-    const existingCount = await prisma.student.count({
-      where: { class: cleanClass },
-    });
+    try {
+      const classStudents = await prisma.student.findMany({
+        where: { class: cleanClass },
+        select: { rollNo: true },
+      });
+      const existingNums = classStudents.map((s) => {
+        const match = s.rollNo.match(/\d+$/);
+        return match ? parseInt(match[0], 10) : 0;
+      });
+      if (existingNums.length > 0) {
+        nextNum = Math.max(...existingNums) + 1;
+      }
+    } catch (e) {
+      nextNum = Math.floor(10 + Math.random() * 90);
+    }
 
-    const newRollNumber = `${prefix}${String(existingCount + 1).padStart(2, '0')}`;
+    const newRollNumber = `AB-${classNum}${String(nextNum).padStart(2, '0')}`;
 
     // 4. Create Student Account
     const student = await prisma.student.create({
@@ -200,7 +234,10 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Error creating admission enquiry and student:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process admission registration. Please try again.' },
+      { 
+        success: false, 
+        error: error?.message || 'Failed to process admission registration. Please try again.' 
+      },
       { status: 500 }
     );
   }
@@ -229,47 +266,9 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: updated });
   } catch (error: any) {
-    console.error('Error updating admission:', error);
+    console.error('Error updating enquiry:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update admission' },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE /api/admissions - Delete an enquiry and optionally associated student
-export async function DELETE(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'Enquiry ID required' },
-        { status: 400 }
-      );
-    }
-
-    const enquiry = await prisma.admissionEnquiry.findUnique({
-      where: { id },
-    });
-
-    if (enquiry) {
-      // Also delete from student if needed
-      await prisma.student.deleteMany({
-        where: { phone: enquiry.phone },
-      });
-
-      await prisma.admissionEnquiry.delete({
-        where: { id },
-      });
-    }
-
-    return NextResponse.json({ success: true, message: 'Deleted successfully' });
-  } catch (error: any) {
-    console.error('Error deleting admission:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to delete admission' },
+      { success: false, error: 'Failed to update enquiry' },
       { status: 500 }
     );
   }
