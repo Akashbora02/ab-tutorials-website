@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, ensureDatabaseTables } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +19,7 @@ function normalizeClass(rawClass?: string): string {
 // GET /api/admissions - List admission leads with optional filters
 export async function GET(req: NextRequest) {
   try {
+    await ensureDatabaseTables();
     const { searchParams } = new URL(req.url);
     const rawClass = searchParams.get('class');
     const status = searchParams.get('status');
@@ -76,6 +77,7 @@ export async function GET(req: NextRequest) {
 // POST /api/admissions - Submit admission application with strict duplicate prevention & student creation
 export async function POST(req: NextRequest) {
   try {
+    await ensureDatabaseTables();
     const body = await req.json();
     const {
       studentName,

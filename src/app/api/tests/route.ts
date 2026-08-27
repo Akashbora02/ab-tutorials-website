@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma, ensureDatabaseTables } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -484,6 +484,7 @@ const initialTestsData = [
 // Helper to auto-seed initial tests for any missing classes
 async function ensureInitialTests(requestedClass?: string | null) {
   try {
+    await ensureDatabaseTables();
     for (const testData of initialTestsData) {
       const existing = await prisma.test.findFirst({
         where: {
