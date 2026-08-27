@@ -12,10 +12,10 @@ import {
   AlertCircle, 
   ArrowRight, 
   MessageSquare,
-  FileSpreadsheet,
   BarChart3,
   UserCheck,
-  Plus
+  Sparkles,
+  Phone
 } from 'lucide-react';
 import { formatDateTime, getClassBadgeColor, getStatusBadgeColor } from '@/lib/utils';
 
@@ -57,12 +57,12 @@ export default function AdminDashboardPage() {
   const maxAdmissionCount = Math.max(...Object.values(admissionsByClass).map(v => Number(v) || 0), 1);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
             Academic & Performance Overview
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -70,18 +70,18 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Link
             href="/admin/admissions"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-1.5"
+            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-1.5"
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Manage Admissions</span>
+            <span>Admissions</span>
           </Link>
 
           <Link
             href="/admin/results"
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-1.5"
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-1.5"
           >
             <Award className="w-3.5 h-3.5" />
             <span>Test Results</span>
@@ -90,109 +90,113 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 4 Clean KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         
         {/* Total Admissions */}
-        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
+        <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Enquiries</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Enquiries</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-white mt-3">
+          <div className="text-2xl sm:text-4xl font-black text-white mt-2 sm:mt-3">
             {stats?.totalAdmissions || 0}
           </div>
-          <div className="text-[11px] text-emerald-400 mt-2 flex items-center gap-1 font-semibold">
-            <TrendingUp className="w-3 h-3" /> Classes 8th to 10th
+          <div className="text-[10px] sm:text-[11px] text-emerald-400 mt-1.5 sm:mt-2 flex items-center gap-1 font-semibold">
+            <TrendingUp className="w-3 h-3 shrink-0" /> Classes 8th-10th
           </div>
         </div>
 
         {/* Enrolled Students */}
-        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
+        <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Active Students</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-              <UserCheck className="w-4 h-4" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Students</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+              <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-white mt-3">
+          <div className="text-2xl sm:text-4xl font-black text-white mt-2 sm:mt-3">
             {stats?.totalStudents || 0}
           </div>
-          <div className="text-[11px] text-slate-400 mt-2">
-            Enrolled in Batches
+          <div className="text-[10px] sm:text-[11px] text-slate-400 mt-1.5 sm:mt-2">
+            Active Roster
           </div>
         </div>
 
         {/* Total Test Bank */}
-        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
+        <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">CBT Tests</span>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
-              <BookOpen className="w-4 h-4" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">CBT Tests</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-white mt-3">
+          <div className="text-2xl sm:text-4xl font-black text-white mt-2 sm:mt-3">
             {stats?.totalTests || 0}
           </div>
-          <div className="text-[11px] text-amber-400 mt-2">
-            Active Question Banks
+          <div className="text-[10px] sm:text-[11px] text-amber-400 mt-1.5 sm:mt-2">
+            Question Banks
           </div>
         </div>
 
         {/* Test Submissions */}
-        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
+        <div className="bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 relative overflow-hidden group shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Tests Evaluated</span>
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
-              <Award className="w-4 h-4" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">Evaluations</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
+              <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl sm:text-4xl font-black text-white mt-3">
+          <div className="text-2xl sm:text-4xl font-black text-white mt-2 sm:mt-3">
             {stats?.totalSubmissions || 0}
           </div>
-          <div className="text-[11px] text-purple-400 mt-2">
-            Auto-Graded Scorecards
+          <div className="text-[10px] sm:text-[11px] text-purple-400 mt-1.5 sm:mt-2">
+            Auto-Graded
           </div>
         </div>
 
       </div>
 
       {/* Class-Wise Admission Distribution Visualization */}
-      <div className="bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-xl">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+      <div className="bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-800 shadow-xl">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
           <div>
-            <h3 className="font-bold text-white text-base flex items-center gap-2">
+            <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-blue-400" />
-              <span>Class-Wise Admission Applications (8th to 10th)</span>
+              <span>Class-Wise Admission Applications (8th, 9th, 10th)</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">Distribution of student registrations by standard</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Distribution of student registrations by standard</p>
           </div>
           <Link
             href="/admin/admissions"
-            className="text-xs text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1"
+            className="text-xs text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 shrink-0"
           >
-            View Details &rarr;
+            View Leads &rarr;
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {['10th', '9th', '8th'].map((cls) => {
-            const count = (admissionsByClass as any)[cls] || 0;
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {[
+            { key: '10th', label: 'Class 10th' },
+            { key: '9th', label: 'Class 9th' },
+            { key: '8th', label: 'Class 8th' }
+          ].map(({ key, label }) => {
+            const count = (admissionsByClass as any)[key] || 0;
             const percentage = Math.round((count / maxAdmissionCount) * 100);
 
             return (
-              <div key={cls} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+              <div key={key} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${getClassBadgeColor(cls)}`}>
-                    Class {cls}
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${getClassBadgeColor(key, true)}`}>
+                    {label}
                   </span>
-                  <span className="text-base font-black text-white">{count} Applicants</span>
+                  <span className="text-sm sm:text-base font-black text-white">{count} Applicants</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                    style={{ width: `${Math.max(percentage, 10)}%` }}
+                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.max(percentage, count > 0 ? 15 : 0)}%` }}
                   />
                 </div>
               </div>
@@ -201,97 +205,123 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Two-Column Grid: Recent Admissions & Recent Test Submissions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Two-Column Grid: Latest Admissions & Recent Test Submissions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         
-        {/* Recent Admissions */}
-        <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between">
+        {/* Latest Admission Inquiries (Enhanced Color Contrast & Mobile Friendly) */}
+        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-              <h3 className="font-bold text-white text-base">Latest Admission Inquiries</h3>
-              <Link href="/admin/admissions" className="text-xs text-blue-400 hover:underline">
-                All Admissions
+              <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                <Users className="w-4 h-4 text-blue-400" />
+                <span>Latest Admission Inquiries</span>
+              </h3>
+              <Link href="/admin/admissions" className="text-xs text-blue-400 hover:text-blue-300 font-bold shrink-0">
+                View All
               </Link>
             </div>
 
             <div className="space-y-3">
-              {(stats?.recentAdmissions || []).slice(0, 4).map((adm: any) => (
-                <div
-                  key={adm.id}
-                  className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs"
-                >
-                  <div>
-                    <div className="font-bold text-white text-sm">{adm.studentName}</div>
-                    <div className="text-slate-400 text-[11px] mt-0.5">
-                      Parent: {adm.parentName} • {adm.phone}
+              {(stats?.recentAdmissions || []).length === 0 ? (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No admission enquiries recorded yet.
+                </div>
+              ) : (
+                (stats?.recentAdmissions || []).slice(0, 4).map((adm: any) => (
+                  <div
+                    key={adm.id}
+                    className="p-3.5 rounded-2xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/80 hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-white text-xs sm:text-sm truncate">
+                        {adm.studentName}
+                      </div>
+                      <div className="text-slate-400 text-[11px] mt-0.5 truncate flex items-center gap-1.5">
+                        <span>Parent: {adm.parentName}</span>
+                        <span>•</span>
+                        <span className="font-mono text-slate-300">{adm.phone}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getClassBadgeColor(adm.targetClass)}`}>
-                      Class {adm.targetClass}
-                    </span>
-                    <div className="mt-1">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getStatusBadgeColor(adm.status)}`}>
+                    
+                    <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getClassBadgeColor(adm.targetClass, true)}`}>
+                        Class {adm.targetClass}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getStatusBadgeColor(adm.status, true)}`}>
                         {adm.status}
                       </span>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div className="pt-4 mt-4 border-t border-slate-800 text-center">
             <Link
               href="/admin/admissions"
-              className="text-xs text-slate-400 hover:text-white font-bold"
+              className="text-xs text-slate-400 hover:text-white font-bold transition flex items-center justify-center gap-1"
             >
-              Open Class-Wise Admissions Manager &rarr;
+              <span>Open Class-Wise Admissions Manager</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
-        {/* Recent Test Submissions */}
-        <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between">
+        {/* Recent Online CBT Submissions (Zero Overflow, Responsive & Clean) */}
+        <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-              <h3 className="font-bold text-white text-base">Recent Online CBT Submissions</h3>
-              <Link href="/admin/results" className="text-xs text-blue-400 hover:underline">
-                All Results
+              <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                <Award className="w-4 h-4 text-purple-400" />
+                <span>Recent Online CBT Submissions</span>
+              </h3>
+              <Link href="/admin/results" className="text-xs text-blue-400 hover:text-blue-300 font-bold shrink-0">
+                View All
               </Link>
             </div>
 
             <div className="space-y-3">
-              {(stats?.recentSubmissions || []).slice(0, 4).map((sub: any) => (
-                <div
-                  key={sub.id}
-                  className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs"
-                >
-                  <div>
-                    <div className="font-bold text-white text-sm">{sub.studentName}</div>
-                    <div className="text-slate-400 text-[11px] mt-0.5 truncate max-w-xs">
-                      {sub.test?.title || 'Practice Test'}
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className={`font-mono font-black text-sm ${sub.isPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {sub.score}/{sub.totalMarks} ({sub.percentage}%)
-                    </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border mt-0.5 inline-block ${getClassBadgeColor(sub.studentClass)}`}>
-                      Class {sub.studentClass}
-                    </span>
-                  </div>
+              {(stats?.recentSubmissions || []).length === 0 ? (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No online exam submissions recorded yet.
                 </div>
-              ))}
+              ) : (
+                (stats?.recentSubmissions || []).slice(0, 4).map((sub: any) => (
+                  <div
+                    key={sub.id}
+                    className="p-3.5 rounded-2xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/80 hover:border-slate-700 transition flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold text-white text-xs sm:text-sm truncate">
+                        {sub.studentName}
+                      </div>
+                      <div className="text-slate-400 text-[11px] mt-0.5 truncate max-w-[200px] sm:max-w-xs">
+                        {sub.test?.title || `${sub.studentClass} Practice Assessment`}
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                      <div className={`font-mono font-black text-xs sm:text-sm ${sub.isPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {sub.score}/{sub.totalMarks} <span className="text-[10px]">({sub.percentage}%)</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getClassBadgeColor(sub.studentClass, true)}`}>
+                        Class {sub.studentClass}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
           <div className="pt-4 mt-4 border-t border-slate-800 text-center">
             <Link
               href="/admin/results"
-              className="text-xs text-slate-400 hover:text-white font-bold"
+              className="text-xs text-slate-400 hover:text-white font-bold transition flex items-center justify-center gap-1"
             >
-              Open Test Results Ledger & Answer Sheets &rarr;
+              <span>Open Test Results Ledger & Answer Sheets</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>

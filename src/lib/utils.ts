@@ -25,43 +25,54 @@ export function formatDateTime(date: Date | string): string {
   });
 }
 
-export function getClassBadgeColor(className: string): string {
-  switch (className?.toLowerCase()) {
-    case "7th":
-    case "class 7":
-    case "class 7th":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "8th":
-    case "class 8":
-    case "class 8th":
-      return "bg-sky-50 text-sky-700 border-sky-200";
-    case "9th":
-    case "class 9":
-    case "class 9th":
-      return "bg-indigo-50 text-indigo-700 border-indigo-200";
-    case "10th":
-    case "class 10":
-    case "class 10th":
-      return "bg-purple-50 text-purple-700 border-purple-200";
-    default:
-      return "bg-gray-50 text-gray-700 border-gray-200";
+export function getClassBadgeColor(className: string, isDark: boolean = false): string {
+  const norm = className?.toLowerCase() || '';
+  if (norm.includes('8')) {
+    return isDark 
+      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-semibold"
+      : "bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold";
   }
+  if (norm.includes('9')) {
+    return isDark 
+      ? "bg-purple-500/20 text-purple-300 border-purple-500/40 font-semibold"
+      : "bg-purple-50 text-purple-700 border-purple-200 font-semibold";
+  }
+  if (norm.includes('10')) {
+    return isDark 
+      ? "bg-blue-500/20 text-blue-300 border-blue-500/40 font-semibold"
+      : "bg-blue-50 text-blue-700 border-blue-200 font-semibold";
+  }
+  return isDark 
+    ? "bg-slate-800 text-slate-300 border-slate-700 font-semibold"
+    : "bg-slate-100 text-slate-700 border-slate-200 font-semibold";
 }
 
-export function getStatusBadgeColor(status: string): string {
+export function getStatusBadgeColor(status: string, isDark: boolean = false): string {
   switch (status?.toUpperCase()) {
     case "NEW":
-      return "bg-amber-100 text-amber-800 border-amber-300";
+      return isDark 
+        ? "bg-blue-500/25 text-blue-300 border-blue-400/40 font-bold"
+        : "bg-blue-50 text-blue-800 border-blue-200 font-bold";
     case "CONTACTED":
-      return "bg-blue-100 text-blue-800 border-blue-300";
+      return isDark 
+        ? "bg-purple-500/25 text-purple-300 border-purple-400/40 font-bold"
+        : "bg-purple-50 text-purple-800 border-purple-200 font-bold";
     case "COUNSELING":
-      return "bg-purple-100 text-purple-800 border-purple-300";
+      return isDark 
+        ? "bg-amber-500/25 text-amber-300 border-amber-400/40 font-bold"
+        : "bg-amber-50 text-amber-800 border-amber-200 font-bold";
     case "ENROLLED":
-      return "bg-emerald-100 text-emerald-800 border-emerald-300";
+      return isDark 
+        ? "bg-emerald-500/25 text-emerald-300 border-emerald-400/40 font-bold"
+        : "bg-emerald-50 text-emerald-800 border-emerald-200 font-bold";
     case "REJECTED":
     case "CLOSED":
-      return "bg-rose-100 text-rose-800 border-rose-300";
+      return isDark 
+        ? "bg-rose-500/25 text-rose-300 border-rose-400/40 font-bold"
+        : "bg-rose-50 text-rose-800 border-rose-200 font-bold";
     default:
-      return "bg-slate-100 text-slate-800 border-slate-300";
+      return isDark 
+        ? "bg-slate-800 text-slate-300 border-slate-700 font-bold"
+        : "bg-slate-100 text-slate-800 border-slate-200 font-bold";
   }
 }
