@@ -118,12 +118,12 @@ export default function AdminAdmissionsPage() {
       'Email',
       'Target Class',
       'Subjects',
-      'School',
+      'School Name',
       'Previous %',
       'Preferred Batch',
       'Status',
-      'Staff Notes',
-      'Date Submitted',
+      'Notes',
+      'Applied Date',
     ];
 
     const rows = admissions.map((a) => [
@@ -152,54 +152,56 @@ export default function AdminAdmissionsPage() {
     document.body.removeChild(link);
   };
 
+  const classTabs = [
+    { id: 'ALL', label: 'All Standards', count: admissions.length },
+    { id: '10th', label: '10th', count: classCounts['10th'] || 0 },
+    { id: '9th', label: '9th', count: classCounts['9th'] || 0 },
+    { id: '8th', label: '8th', count: classCounts['8th'] || 0 },
+  ];
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Class-Wise Admissions Management
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
+              Class-Wise Admissions Manager
             </h1>
-            <span className="bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">
-              {admissions.length} Records
+            <span className="bg-blue-600/30 text-blue-300 border border-blue-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">
+              {admissions.length} Enquiries
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Filter student leads by standard (8th, 9th, 10th), update counseling pipeline status, and log staff notes.
+            Review online application leads for Classes 8th, 9th, and 10th (Science & Maths).
           </p>
         </div>
 
         <button
           onClick={exportToCSV}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0"
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
         >
           <Download className="w-4 h-4" />
-          <span>Export to CSV</span>
+          <span>Export CSV</span>
         </button>
       </div>
 
-      {/* Class Tab Filters */}
-      <div className="flex flex-wrap gap-2 pb-2">
-        {[
-          { id: 'ALL', label: 'All Classes', count: Object.values(classCounts).reduce((a: any, b: any) => a + b, 0) },
-          { id: '10th', label: 'Class 10th', count: classCounts['10th'] || 0 },
-          { id: '9th', label: 'Class 9th', count: classCounts['9th'] || 0 },
-          { id: '8th', label: 'Class 8th', count: classCounts['8th'] || 0 },
-        ].map((tab) => (
+      {/* Class Selector Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800/60">
+        {classTabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setSelectedClass(tab.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 shrink-0 cursor-pointer ${
               selectedClass === tab.id
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
             <span>{tab.label}</span>
             <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-              selectedClass === tab.id ? 'bg-indigo-800 text-white' : 'bg-slate-800 text-slate-400'
+              selectedClass === tab.id ? 'bg-blue-800 text-white' : 'bg-slate-800 text-slate-400'
             }`}>
               {tab.count}
             </span>
@@ -218,7 +220,7 @@ export default function AdminAdmissionsPage() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by student, parent, phone, school..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -228,7 +230,7 @@ export default function AdminAdmissionsPage() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full sm:w-auto px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="NEW">NEW LEADS</option>
@@ -241,11 +243,11 @@ export default function AdminAdmissionsPage() {
 
       </div>
 
-      {/* Admissions Table */}
+      {/* Admissions Table (Fixed Column Overlap with min-w-full and min-w-[820px]) */}
       <div className="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
         {loading ? (
           <div className="py-20 text-center text-slate-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
             <p className="text-xs mt-3">Loading admission records...</p>
           </div>
         ) : admissions.length === 0 ? (
@@ -253,17 +255,17 @@ export default function AdminAdmissionsPage() {
             No admission inquiries found for the selected filter.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[820px] text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-900 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
-                  <th className="py-3.5 px-4">Student & Parent</th>
-                  <th className="py-3.5 px-4">Class & Subjects</th>
-                  <th className="py-3.5 px-4">Contact Info</th>
-                  <th className="py-3.5 px-4">School & Score</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Staff Notes</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-4 min-w-[180px]">Student & Parent</th>
+                  <th className="py-3.5 px-4 min-w-[120px]">Class & Subjects</th>
+                  <th className="py-3.5 px-4 min-w-[150px]">Contact Info</th>
+                  <th className="py-3.5 px-4 min-w-[130px]">School & Score</th>
+                  <th className="py-3.5 px-4 min-w-[120px]">Status</th>
+                  <th className="py-3.5 px-4 min-w-[160px]">Staff Notes</th>
+                  <th className="py-3.5 px-4 text-right min-w-[70px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-900/60 text-slate-300">
@@ -283,16 +285,16 @@ export default function AdminAdmissionsPage() {
 
                     {/* Class & Subjects */}
                     <td className="py-4 px-4">
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border ${getClassBadgeColor(adm.targetClass)}`}>
-                        Class {adm.targetClass}
+                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border whitespace-nowrap ${getClassBadgeColor(adm.targetClass, true)}`}>
+                        {adm.targetClass}
                       </span>
-                      <div className="text-[11px] text-slate-400 mt-1">{adm.subjects}</div>
-                      <div className="text-[10px] text-indigo-400 mt-0.5">{adm.preferredBatch}</div>
+                      <div className="text-[11px] text-slate-400 mt-1 truncate max-w-[110px]">{adm.subjects}</div>
+                      <div className="text-[10px] text-blue-400 mt-0.5">{adm.preferredBatch}</div>
                     </td>
 
                     {/* Contact */}
                     <td className="py-4 px-4">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 whitespace-nowrap">
                         <a
                           href={`tel:${adm.phone}`}
                           className="font-mono text-emerald-400 hover:underline font-bold"
@@ -318,9 +320,9 @@ export default function AdminAdmissionsPage() {
 
                     {/* School & Previous Score */}
                     <td className="py-4 px-4">
-                      <div className="text-slate-200">{adm.schoolName || '—'}</div>
-                      <div className="text-[10px] text-amber-400 font-semibold mt-0.5">
-                        Prev Score: {adm.previousPercentage || 'N/A'}
+                      <div className="text-slate-200 truncate max-w-[120px]">{adm.schoolName || '—'}</div>
+                      <div className="text-[10px] text-amber-400 font-semibold mt-0.5 whitespace-nowrap">
+                        Prev: {adm.previousPercentage || 'N/A'}
                       </div>
                     </td>
 
@@ -329,8 +331,9 @@ export default function AdminAdmissionsPage() {
                       <select
                         value={adm.status}
                         onChange={(e) => handleStatusChange(adm.id, e.target.value)}
-                        className={`text-[10px] font-bold px-2 py-1 rounded-lg border focus:outline-hidden bg-slate-900 ${getStatusBadgeColor(
-                          adm.status
+                        className={`text-[10px] font-bold px-2 py-1 rounded-lg border focus:outline-hidden bg-slate-900 whitespace-nowrap ${getStatusBadgeColor(
+                          adm.status,
+                          true
                         )}`}
                       >
                         <option value="NEW">NEW</option>
@@ -353,13 +356,13 @@ export default function AdminAdmissionsPage() {
                           />
                           <button
                             onClick={() => handleSaveNotes(adm.id)}
-                            className="p-1 text-emerald-400 hover:text-emerald-300"
+                            className="p-1 text-emerald-400 hover:text-emerald-300 cursor-pointer"
                           >
                             <Save className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setEditingId(null)}
-                            className="p-1 text-slate-500 hover:text-slate-400"
+                            className="p-1 text-slate-500 hover:text-slate-400 cursor-pointer"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -384,7 +387,7 @@ export default function AdminAdmissionsPage() {
                     <td className="py-4 px-4 text-right">
                       <button
                         onClick={() => handleDelete(adm.id)}
-                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg transition"
+                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg transition cursor-pointer"
                         title="Delete record"
                       >
                         <Trash2 className="w-4 h-4" />

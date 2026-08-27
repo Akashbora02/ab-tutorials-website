@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
           <div>
             <h3 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-blue-400" />
-              <span>Class-Wise Admission Applications (8th, 9th, 10th)</span>
+              <span>Class-Wise Admission Applications</span>
             </h3>
             <p className="text-[11px] text-slate-400 mt-0.5">Distribution of student registrations by standard</p>
           </div>
@@ -178,9 +178,9 @@ export default function AdminDashboardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
-            { key: '10th', label: 'Class 10th' },
-            { key: '9th', label: 'Class 9th' },
-            { key: '8th', label: 'Class 8th' }
+            { key: '10th', label: '10th' },
+            { key: '9th', label: '9th' },
+            { key: '8th', label: '8th' }
           ].map(({ key, label }) => {
             const count = (admissionsByClass as any)[key] || 0;
             const percentage = Math.round((count / maxAdmissionCount) * 100);
@@ -188,7 +188,7 @@ export default function AdminDashboardPage() {
             return (
               <div key={key} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${getClassBadgeColor(key, true)}`}>
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border whitespace-nowrap ${getClassBadgeColor(key, true)}`}>
                     {label}
                   </span>
                   <span className="text-sm sm:text-base font-black text-white">{count} Applicants</span>
@@ -208,7 +208,7 @@ export default function AdminDashboardPage() {
       {/* Two-Column Grid: Latest Admissions & Recent Test Submissions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         
-        {/* Latest Admission Inquiries (Enhanced Color Contrast & Mobile Friendly) */}
+        {/* Latest Admission Inquiries */}
         <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
@@ -244,10 +244,10 @@ export default function AdminDashboardPage() {
                     </div>
                     
                     <div className="text-right shrink-0 flex flex-col items-end gap-1">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getClassBadgeColor(adm.targetClass, true)}`}>
-                        Class {adm.targetClass}
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${getClassBadgeColor(adm.targetClass, true)}`}>
+                        {adm.targetClass}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getStatusBadgeColor(adm.status, true)}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap ${getStatusBadgeColor(adm.status, true)}`}>
                         {adm.status}
                       </span>
                     </div>
@@ -268,7 +268,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Recent Online CBT Submissions (Zero Overflow, Responsive & Clean) */}
+        {/* Recent Online CBT Submissions */}
         <div className="bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
@@ -296,17 +296,17 @@ export default function AdminDashboardPage() {
                       <div className="font-bold text-white text-xs sm:text-sm truncate">
                         {sub.studentName}
                       </div>
-                      <div className="text-slate-400 text-[11px] mt-0.5 truncate max-w-[200px] sm:max-w-xs">
+                      <div className="text-slate-400 text-[11px] mt-0.5 truncate max-w-[180px] sm:max-w-xs">
                         {sub.test?.title || `${sub.studentClass} Practice Assessment`}
                       </div>
                     </div>
 
                     <div className="text-right shrink-0 flex flex-col items-end gap-1">
-                      <div className={`font-mono font-black text-xs sm:text-sm ${sub.isPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <div className={`font-mono font-black text-xs sm:text-sm whitespace-nowrap ${sub.isPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {sub.score}/{sub.totalMarks} <span className="text-[10px]">({sub.percentage}%)</span>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getClassBadgeColor(sub.studentClass, true)}`}>
-                        Class {sub.studentClass}
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap ${getClassBadgeColor(sub.studentClass, true)}`}>
+                        {sub.studentClass}
                       </span>
                     </div>
                   </div>

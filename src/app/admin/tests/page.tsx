@@ -193,8 +193,8 @@ export default function AdminTestsPage() {
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getClassBadgeColor(test.class)}`}>
-                    Class {test.class}
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border whitespace-nowrap ${getClassBadgeColor(test.class, true)}`}>
+                    {test.class}
                   </span>
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                     test.subject === 'Mathematics'

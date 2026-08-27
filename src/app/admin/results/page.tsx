@@ -9,9 +9,9 @@ import {
   XCircle, 
   Clock, 
   FileSpreadsheet, 
-  Eye,
-  Filter,
-  X
+  Eye, 
+  Filter, 
+  X 
 } from 'lucide-react';
 import { formatDateTime, getClassBadgeColor } from '@/lib/utils';
 
@@ -93,16 +93,16 @@ export default function AdminResultsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
               Student Test Results Ledger
             </h1>
-            <span className="bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">
+            <span className="bg-purple-600/30 text-purple-300 border border-purple-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {submissions.length} Submissions
             </span>
           </div>
@@ -113,7 +113,7 @@ export default function AdminResultsPage() {
 
         <button
           onClick={exportToCSV}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0"
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 shrink-0 cursor-pointer"
         >
           <Download className="w-4 h-4" />
           <span>Export Results CSV</span>
@@ -122,44 +122,44 @@ export default function AdminResultsPage() {
 
       {/* Aggregate Stats Strip */}
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div className="text-xs text-slate-400 font-bold uppercase">Total Tests Taken</div>
-            <div className="text-2xl font-black text-white mt-1">{stats.totalSubmissions}</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">Total Tests Taken</div>
+            <div className="text-xl sm:text-2xl font-black text-white mt-1">{stats.totalSubmissions}</div>
           </div>
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div className="text-xs text-slate-400 font-bold uppercase">Passing Rate</div>
-            <div className="text-2xl font-black text-emerald-400 mt-1">{stats.passRate}%</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">Passing Rate</div>
+            <div className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">{stats.passRate}%</div>
           </div>
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div className="text-xs text-slate-400 font-bold uppercase">Average Score</div>
-            <div className="text-2xl font-black text-indigo-400 mt-1">{stats.avgPercentage}%</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">Average Score</div>
+            <div className="text-xl sm:text-2xl font-black text-blue-400 mt-1">{stats.avgPercentage}%</div>
           </div>
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div className="text-xs text-slate-400 font-bold uppercase">Passed Count</div>
-            <div className="text-2xl font-black text-amber-400 mt-1">{stats.passedCount} Students</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">Passed Count</div>
+            <div className="text-xl sm:text-2xl font-black text-amber-400 mt-1">{stats.passedCount} Students</div>
           </div>
         </div>
       )}
 
-      {/* Filters & Search */}
+      {/* Class Tabs & Search */}
       <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        {/* Class Filter Tabs */}
+        {/* Class Filter Pills */}
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           {[
-            { id: 'ALL', label: 'All Classes' },
-            { id: '10th', label: 'Class 10th' },
-            { id: '9th', label: 'Class 9th' },
-            { id: '8th', label: 'Class 8th' },
+            { id: 'ALL', label: 'All Standards' },
+            { id: '10th', label: '10th' },
+            { id: '9th', label: '9th' },
+            { id: '8th', label: '8th' },
           ].map((c) => (
             <button
               key={c.id}
               onClick={() => setSelectedClass(c.id)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 selectedClass === c.id
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-slate-900 text-slate-400 hover:text-white'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
               {c.label}
@@ -167,44 +167,44 @@ export default function AdminResultsPage() {
           ))}
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full sm:w-72">
+        {/* Search */}
+        <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by student name or roll no..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+            placeholder="Search by student name or roll number..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
       </div>
 
-      {/* Submissions Table */}
+      {/* Results Ledger Table (Clean Fixed Widths, min-w-[780px]) */}
       <div className="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
         {loading ? (
           <div className="py-20 text-center text-slate-400">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div>
-            <p className="text-xs mt-3">Loading result ledger...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="text-xs mt-3">Loading assessment results...</p>
           </div>
         ) : submissions.length === 0 ? (
           <div className="py-16 text-center text-slate-500 text-xs">
-            No test submissions found for the selected filter.
+            No test evaluations found matching criteria.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[780px] text-left text-xs border-collapse">
               <thead>
                 <tr className="bg-slate-900 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800">
-                  <th className="py-3.5 px-4">Student Details</th>
-                  <th className="py-3.5 px-4">Class</th>
-                  <th className="py-3.5 px-4">Test Title</th>
-                  <th className="py-3.5 px-4">Score / Max</th>
-                  <th className="py-3.5 px-4">Percentage</th>
-                  <th className="py-3.5 px-4">Time Taken</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-4 min-w-[170px]">Student Details</th>
+                  <th className="py-3.5 px-4 min-w-[80px]">Class</th>
+                  <th className="py-3.5 px-4 min-w-[200px]">Test Title</th>
+                  <th className="py-3.5 px-4 min-w-[100px]">Score / Max</th>
+                  <th className="py-3.5 px-4 min-w-[90px]">Percentage</th>
+                  <th className="py-3.5 px-4 min-w-[100px]">Time Taken</th>
+                  <th className="py-3.5 px-4 min-w-[90px]">Status</th>
+                  <th className="py-3.5 px-4 text-right min-w-[80px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-900/60 text-slate-300">
@@ -213,49 +213,49 @@ export default function AdminResultsPage() {
                     
                     <td className="py-4 px-4">
                       <div className="font-bold text-white text-sm">{sub.studentName}</div>
-                      <div className="font-mono text-indigo-400 text-[11px] mt-0.5">
+                      <div className="font-mono text-blue-400 text-[11px] mt-0.5 whitespace-nowrap">
                         Roll: {sub.studentRollNo || 'GUEST'}
                       </div>
-                      <div className="text-slate-500 text-[10px] mt-0.5">
+                      <div className="text-slate-500 text-[10px] mt-0.5 whitespace-nowrap">
                         {formatDateTime(sub.submittedAt)}
                       </div>
                     </td>
 
                     <td className="py-4 px-4">
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border ${getClassBadgeColor(sub.studentClass)}`}>
-                        Class {sub.studentClass}
+                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border whitespace-nowrap ${getClassBadgeColor(sub.studentClass, true)}`}>
+                        {sub.studentClass}
                       </span>
                     </td>
 
                     <td className="py-4 px-4 max-w-xs">
-                      <div className="font-bold text-white truncate">{sub.test?.title || 'Online Test'}</div>
-                      <div className="text-slate-400 text-[11px]">{sub.test?.subject}</div>
+                      <div className="font-bold text-white truncate max-w-[200px]">{sub.test?.title || 'Online Test'}</div>
+                      <div className="text-slate-400 text-[11px] whitespace-nowrap">{sub.test?.subject}</div>
                     </td>
 
-                    <td className="py-4 px-4 font-mono font-bold text-sm">
+                    <td className="py-4 px-4 font-mono font-bold text-sm whitespace-nowrap">
                       <span className={sub.isPassed ? 'text-emerald-400' : 'text-rose-400'}>
                         {sub.score}
                       </span>
                       <span className="text-slate-500"> / {sub.totalMarks}</span>
                     </td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 whitespace-nowrap">
                       <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
                         sub.percentage >= 80
                           ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                           : sub.percentage >= 50
-                          ? 'bg-indigo-950 text-indigo-300 border border-indigo-800'
+                          ? 'bg-blue-950 text-blue-300 border border-blue-800'
                           : 'bg-rose-950 text-rose-300 border border-rose-800'
                       }`}>
                         {sub.percentage}%
                       </span>
                     </td>
 
-                    <td className="py-4 px-4 text-slate-400 font-mono">
+                    <td className="py-4 px-4 text-slate-400 font-mono whitespace-nowrap">
                       {Math.floor(sub.timeTakenSeconds / 60)}m {sub.timeTakenSeconds % 60}s
                     </td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 whitespace-nowrap">
                       {sub.isPassed ? (
                         <span className="text-emerald-400 font-bold flex items-center gap-1 text-[11px]">
                           <CheckCircle2 className="w-3.5 h-3.5" /> PASSED
@@ -267,10 +267,10 @@ export default function AdminResultsPage() {
                       )}
                     </td>
 
-                    <td className="py-4 px-4 text-right">
+                    <td className="py-4 px-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => setInspectSubmission(sub)}
-                        className="p-1.5 rounded-lg bg-slate-900 hover:bg-indigo-600 text-slate-300 hover:text-white transition inline-flex items-center gap-1 text-[11px] font-bold border border-slate-800"
+                        className="p-1.5 rounded-lg bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white transition inline-flex items-center gap-1 text-[11px] font-bold border border-slate-800 cursor-pointer"
                         title="View detailed scorecard"
                       >
                         <Eye className="w-3.5 h-3.5" />
@@ -297,7 +297,7 @@ export default function AdminResultsPage() {
               </div>
               <button
                 onClick={() => setInspectSubmission(null)}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -307,7 +307,7 @@ export default function AdminResultsPage() {
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-slate-500 font-bold uppercase text-[10px]">Test Name</div>
-                  <div className="text-white font-bold mt-0.5">{inspectSubmission.test?.title}</div>
+                  <div className="text-white font-bold mt-0.5 truncate">{inspectSubmission.test?.title}</div>
                 </div>
                 <div>
                   <div className="text-slate-500 font-bold uppercase text-[10px]">Score Achieved</div>
@@ -319,7 +319,7 @@ export default function AdminResultsPage() {
 
               <div>
                 <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Selected Student Answers (Raw Payload)</div>
-                <pre className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-indigo-300 overflow-x-auto">
+                <pre className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono text-blue-300 overflow-x-auto max-h-48">
                   {JSON.stringify(JSON.parse(inspectSubmission.answersJson || '{}'), null, 2)}
                 </pre>
               </div>
@@ -327,7 +327,7 @@ export default function AdminResultsPage() {
               <div className="pt-2 text-right">
                 <button
                   onClick={() => setInspectSubmission(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs"
+                  className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs cursor-pointer"
                 >
                   Close Inspector
                 </button>
