@@ -15,13 +15,31 @@ import {
   BarChart3,
   UserCheck,
   Sparkles,
-  Phone
+  Phone,
+  Trash2,
+  ShieldAlert,
+  Database,
+  Lock,
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { formatDateTime, getClassBadgeColor, getStatusBadgeColor } from '@/lib/utils';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Database Flush Modal State
+  const [showFlushModal, setShowFlushModal] = useState(false);
+  const [flushPassword, setFlushPassword] = useState('');
+  const [flushConfirmText, setFlushConfirmText] = useState('');
+  const [flushStudents, setFlushStudents] = useState(true);
+  const [flushAdmissions, setFlushAdmissions] = useState(true);
+  const [flushSubmissions, setFlushSubmissions] = useState(true);
+  const [flushMessages, setFlushMessages] = useState(false);
+  const [flushing, setFlushing] = useState(false);
+  const [flushError, setFlushError] = useState('');
+  const [flushSuccess, setFlushSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
@@ -39,6 +57,46 @@ export default function AdminDashboardPage() {
       console.error('Failed to load admin stats:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExecuteFlush = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFlushing(true);
+    setFlushError('');
+    setFlushSuccess(null);
+
+    try {
+      const res = await fetch('/api/admin/flush', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: flushPassword,
+          confirmationText: flushConfirmText.trim(),
+          flushStudents,
+          flushAdmissions,
+          flushSubmissions,
+          flushMessages,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setFlushSuccess('Student data successfully flushed! Test questions and admin accounts remain 100% intact.');
+        setFlushPassword('');
+        setFlushConfirmText('');
+        fetchStats();
+        setTimeout(() => {
+          setShowFlushModal(false);
+          setFlushSuccess(null);
+        }, 2500);
+      } else {
+        setFlushError(data.error || 'Failed to execute flush.');
+      }
+    } catch (err) {
+      setFlushError('Network error executing database flush.');
+    } finally {
+      setFlushing(false);
     }
   };
 
@@ -71,20 +129,29 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => setShowFlushModal(true)}
+            className="px-3.5 py-2 bg-rose-950/40 hover:bg-rose-950/70 text-rose-300 border border-rose-900/60 font-bold rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer"
+            title="Wipe test data and student records while preserving test bank"
+          >
+            <Database className="w-3.5 h-3.5 text-rose-400" />
+            <span>Flush Student DB</span>
+          </button>
+
+          <Link
+            href="/admin/top-results"
+            className="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold rounded-xl text-xs transition flex items-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Hall of Fame</span>
+          </Link>
+
           <Link
             href="/admin/admissions"
             className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-1.5"
           >
             <Users className="w-3.5 h-3.5" />
             <span>Admissions</span>
-          </Link>
-
-          <Link
-            href="/admin/results"
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-1.5"
-          >
-            <Award className="w-3.5 h-3.5" />
-            <span>Test Results</span>
           </Link>
         </div>
       </div>
@@ -327,6 +394,167 @@ export default function AdminDashboardPage() {
         </div>
 
       </div>
+
+      {/* ========================================================================= */}
+      {/* SECURE STUDENT-ONLY DATABASE FLUSH MODAL                                  */}
+      {/* ========================================================================= */}
+      {showFlushModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border-2 border-rose-900/60 text-slate-100 animate-in zoom-in-95 space-y-5">
+            
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2 text-rose-400">
+                <ShieldAlert className="w-5 h-5" />
+                <h3 className="font-black text-base sm:text-lg text-white">Student Data Flush Engine</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowFlushModal(false);
+                  setFlushError('');
+                  setFlushSuccess(null);
+                }}
+                className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-rose-950/30 border border-rose-900/40 text-xs text-rose-200 leading-relaxed space-y-1.5">
+              <div className="font-bold flex items-center gap-1 text-rose-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>Zero Risk to Questions & Tests</span>
+              </div>
+              <p>
+                This utility will <strong>ONLY wipe student-generated records</strong> (students, admissions, test scorecards). 
+                Your <strong>Test & Question Banks, Hall of Fame, and Admin credentials stay 100% preserved.</strong>
+              </p>
+            </div>
+
+            {flushError && (
+              <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>{flushError}</span>
+              </div>
+            )}
+
+            {flushSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                <span>{flushSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleExecuteFlush} className="space-y-4 text-xs">
+              
+              {/* Selectable Tables to Purge */}
+              <div className="space-y-2 bg-slate-950 p-3.5 rounded-2xl border border-slate-800">
+                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Select Data Entities to Reset:
+                </div>
+
+                <label className="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={flushStudents}
+                    onChange={(e) => setFlushStudents(e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-rose-500 w-4 h-4"
+                  />
+                  <span>Student Roster & Login PINs ({stats?.totalStudents || 0} Records)</span>
+                </label>
+
+                <label className="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={flushAdmissions}
+                    onChange={(e) => setFlushAdmissions(e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-rose-500 w-4 h-4"
+                  />
+                  <span>Online Admission Applications ({stats?.totalAdmissions || 0} Leads)</span>
+                </label>
+
+                <label className="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={flushSubmissions}
+                    onChange={(e) => setFlushSubmissions(e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-rose-500 w-4 h-4"
+                  />
+                  <span>Online CBT Test Scorecards ({stats?.totalSubmissions || 0} Submissions)</span>
+                </label>
+
+                <label className="flex items-center gap-2.5 cursor-pointer text-slate-400 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={flushMessages}
+                    onChange={(e) => setFlushMessages(e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-rose-600 focus:ring-rose-500 w-4 h-4"
+                  />
+                  <span>Website Contact Inquiries (Optional)</span>
+                </label>
+              </div>
+
+              {/* Safety Confirmation Inputs */}
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">
+                  Type <strong className="text-white font-mono bg-slate-800 px-1.5 py-0.5 rounded">FLUSH</strong> to confirm: *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={flushConfirmText}
+                  onChange={(e) => setFlushConfirmText(e.target.value)}
+                  placeholder="FLUSH"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono font-bold uppercase tracking-wider focus:outline-hidden focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Admin Password: *</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    type="password"
+                    required
+                    value={flushPassword}
+                    onChange={(e) => setFlushPassword(e.target.value)}
+                    placeholder="Enter Admin Password"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-hidden focus:ring-2 focus:ring-rose-500"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowFlushModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={flushing || flushConfirmText !== 'FLUSH' || !flushPassword}
+                  className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition flex items-center gap-2 shadow-lg disabled:opacity-40 cursor-pointer"
+                >
+                  {flushing ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Flushing Data...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Execute Student Flush</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -14,7 +14,7 @@ export const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 /**
- * Self-healing helper: automatically creates tables if the database is newly initialized on Vercel/Neon/PostgreSQL.
+ * Self-healing helper: automatically creates tables and initial seed data if the database is newly initialized on Vercel/Neon/PostgreSQL.
  */
 export async function ensureDatabaseTables() {
   if (globalForPrisma.schemaInitialized) return;
@@ -141,6 +141,42 @@ export async function ensureDatabaseTables() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // 8. TopResult Table
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "TopResult" (
+        "id" TEXT PRIMARY KEY,
+        "studentName" TEXT NOT NULL,
+        "class" TEXT NOT NULL,
+        "percentage" TEXT NOT NULL,
+        "score" TEXT,
+        "schoolName" TEXT,
+        "year" TEXT NOT NULL DEFAULT '2024-25',
+        "subject" TEXT NOT NULL DEFAULT 'Mathematics & Science',
+        "rank" TEXT,
+        "testimonial" TEXT,
+        "photoUrl" TEXT,
+        "isFeatured" BOOLEAN NOT NULL DEFAULT true,
+        "order" INTEGER NOT NULL DEFAULT 0,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Self-seed default top results if table is empty
+    const countTop = await prisma.$queryRawUnsafe<any[]>(`SELECT count(*) FROM "TopResult";`).catch(() => []);
+    const rowCount = countTop && countTop[0] ? Number(countTop[0].count || countTop[0].count_big || 0) : 0;
+
+    if (rowCount === 0) {
+      await prisma.$executeRawUnsafe(`
+        INSERT INTO "TopResult" ("id", "studentName", "class", "percentage", "score", "schoolName", "year", "subject", "rank", "testimonial", "isFeatured", "order")
+        VALUES 
+          ('top-1', 'Rahul', '10th', '95%', 'Improved from 60% to 95%', 'SYCV Rajuri', '2024-25', 'Mathematics & Science', 'Class 10th Board Topper', 'Prof. Akshay Bora helped me understand core scientific concepts and algebra formulas easily.', true, 1),
+          ('top-2', 'Sneha', '10th', '92%', 'Concepts became very easy', 'SYCV Rajuri', '2024-25', 'Science & Mathematics', 'Board Distinction', 'Weekly tests and personalized doubt solving gave me huge confidence for board exams.', true, 2),
+          ('top-3', 'Amit', '10th', '90%', 'Weekly tests helped a lot', 'Z.P. High School', '2024-25', 'Mathematics & Science', 'Top Scorer in Science', 'The step-by-step guidance and regular evaluation helped me score above 90%.', true, 3)
+        ON CONFLICT ("id") DO NOTHING;
+      `).catch(() => {});
+    }
 
     globalForPrisma.schemaInitialized = true;
   } catch (err) {

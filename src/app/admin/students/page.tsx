@@ -9,9 +9,10 @@ import {
   Mail, 
   Trash2, 
   KeyRound, 
-  X,
-  CheckCircle2,
-  Users
+  X, 
+  CheckCircle2, 
+  Users,
+  Download
 } from 'lucide-react';
 import { getClassBadgeColor } from '@/lib/utils';
 
@@ -100,6 +101,48 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const exportToCSV = () => {
+    if (students.length === 0) return alert('No student records to export.');
+
+    const headers = [
+      'ID',
+      'Roll No',
+      'Student Name',
+      'Class',
+      'Subjects',
+      'Phone',
+      'Email',
+      'Parent Name',
+      'Parent Phone',
+      'Login PIN',
+      'Status',
+    ];
+
+    const rows = students.map((s) => [
+      s.id,
+      `"${s.rollNo}"`,
+      `"${(s.name || '').replace(/"/g, '""')}"`,
+      `"${s.class}"`,
+      `"${(s.subjects || '').replace(/"/g, '""')}"`,
+      `"${(s.phone || '').replace(/"/g, '""')}"`,
+      `"${(s.email || '').replace(/"/g, '""')}"`,
+      `"${(s.parentName || '').replace(/"/g, '""')}"`,
+      `"${(s.parentPhone || '').replace(/"/g, '""')}"`,
+      `"${s.pin || '1234'}"`,
+      `"${s.status || 'Active'}"`,
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ab_tutorials_students_${selectedClass}_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto w-full">
       
@@ -119,13 +162,23 @@ export default function AdminStudentsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Enroll New Student</span>
-        </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={exportToCSV}
+            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-2 cursor-pointer"
+          >
+            <Download className="w-4 h-4" />
+            <span>Export CSV</span>
+          </button>
+
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Enroll New Student</span>
+          </button>
+        </div>
       </div>
 
       {/* Class Tabs & Search */}

@@ -15,7 +15,7 @@
 ### ✨ Key Features
 
 1. **Modern Responsive Public Portal**:
-   - **Homepage**: Hero showcase, verified student results (Rahul 95%, Sneha 92%, Amit 90%), 4-stage pedagogy, photo galleries, and WhatsApp counseling actions.
+   - **Homepage**: Hero showcase, dynamic database-backed Hall of Fame (Rahul 95%, Sneha 92%, Amit 90%), 4-stage pedagogy, photo galleries, and WhatsApp counseling actions.
    - **About Director**: Verified biography of Prof. Akshay Bora (M.Sc Botany & B.Ed, 4+ Years Experience).
    - **Curriculum & Batches**: Detailed Class 8th, 9th, and 10th Science & Mathematics syllabus.
    - **Classroom Photo Gallery**: Filterable moments from lectures, experiments, and annual topper felicitations.
@@ -34,11 +34,14 @@
    - Instant auto-grading, pass/fail badges, and step-by-step mathematical & scientific explanations.
 
 4. **Private Admin Command Center (`/admin/login`)**:
-   - **Admissions Pipeline**: Class-wise lead records, status toggles (`NEW`, `CONTACTED`, `COUNSELING`, `ENROLLED`), staff notes, CSV export.
-   - **Student Roster**: Student directory with roll numbers, registered phone numbers, and PINs.
-   - **Test Results Ledger**: Real-time scorecards and raw answer sheets.
-   - **Test Builder**: Standardized test and question authoring.
-   - **Inquiry Inbox**: Read and resolve incoming website inquiries.
+   - **Overview Telemetry**: Real-time KPI counts, class distribution graphs, and quick access.
+   - **Student Data Flush Engine**: Secure, password-protected utility to wipe student test records while keeping 100% of question banks and admin accounts intact.
+   - **Top Results (Hall of Fame) Manager**: Add, edit, feature, and archive top board performers with percentages, ranks, and student testimonials.
+   - **Admissions Pipeline**: Class-wise lead records, status toggles (`NEW`, `CONTACTED`, `COUNSELING`, `ENROLLED`), staff notes, UTF-8 BOM CSV export.
+   - **Student Roster**: Student directory with roll numbers, registered phone numbers, PINs, and full CSV export.
+   - **Test Results Ledger**: Real-time scorecards, raw answer sheets, and CSV export.
+   - **Test & Question Builder**: Standardized test and question authoring.
+   - **Inquiry Inbox**: Read and resolve incoming website inquiries with CSV export.
 
 ---
 
@@ -48,7 +51,7 @@
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
-- **ORM & Database**: Prisma ORM (SQLite for local dev / Postgres for Vercel production)
+- **ORM & Database**: Prisma ORM (Cloud PostgreSQL for Vercel production)
 - **Runtime**: Node.js 18+ / 20+
 
 ---
@@ -61,11 +64,10 @@ git clone https://github.com/Akashbora02/ab-tutorials-website.git
 cd ab-tutorials-website
 
 # 2. Install dependencies
-pnpm install # or npm install / yarn
+pnpm install
 
 # 3. Initialize database
-pnpm prisma db push
-pnpm prisma db seed
+pnpm prisma generate
 
 # 4. Run development server
 pnpm dev
@@ -76,49 +78,9 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## 🌐 Vercel Deployment Instructions
 
-Follow these steps to deploy **AB Tutorials** to Vercel:
-
-### Step 1: Create a Free Cloud Database (PostgreSQL)
-Because Vercel is a serverless platform with read-only file systems in production, SQLite should be swapped to a hosted PostgreSQL instance (e.g. **Neon**, **Supabase**, or **Vercel Postgres**):
-1. Create a free PostgreSQL database on [Neon.tech](https://neon.tech) or [Supabase.com](https://supabase.com).
-2. Copy your connection string (e.g. `postgresql://user:password@ep-xyz.neon.tech/abtutorials?sslmode=require`).
-
-### Step 2: Push to GitHub
-```bash
-git remote set-url origin https://github.com/Akashbora02/ab-tutorials-website.git
-git push -u origin main
-```
-
-### Step 3: Deploy on Vercel
-1. Log in to [Vercel.com](https://vercel.com) with your GitHub account.
-2. Click **"Add New"** &rarr; **"Project"**.
-3. Import the `Akashbora02/ab-tutorials-website` repository.
-4. In **Environment Variables**, add:
-   - `DATABASE_URL`: *Your cloud PostgreSQL connection string*
+1. **Repository**: `https://github.com/Akashbora02/ab-tutorials-website.git` (branch `main`)
+2. **Environment Variables**:
+   - `DATABASE_URL`: *Cloud PostgreSQL connection string (Neon / Supabase)*
    - `ADMIN_USERNAME`: `admin`
    - `ADMIN_PASSWORD`: `admin123`
-5. In `prisma/schema.prisma`, update the provider datasource:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-6. Click **"Deploy"**!
-
-### Step 4: Seed Production Database
-In your local terminal or Vercel deployment console:
-```bash
-DATABASE_URL="your-postgresql-url" pnpm prisma db push
-DATABASE_URL="your-postgresql-url" pnpm prisma db seed
-```
-
----
-
-## 👨‍🏫 Institute Leadership
-
-- **Director**: Prof. Akshay Bora
-- **Experience**: 4+ Years
-- **Location**: Rajuri (Near New Talathi Office), Tal-Rahata, Dist-Ahilyanagar, 413737
-- **Phone / WhatsApp**: [+91 98907 24002](https://wa.me/919890724002)
-- **Email**: [akshaybora82@gmail.com](mailto:akshaybora82@gmail.com)
+3. Click **Deploy**. Vercel will automatically generate Prisma Client and build all 20 routes.

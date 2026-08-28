@@ -128,25 +128,26 @@ export default function AdminAdmissionsPage() {
 
     const rows = admissions.map((a) => [
       a.id,
-      `"${a.studentName}"`,
-      `"${a.parentName}"`,
-      `"${a.phone}"`,
-      `"${a.email || ''}"`,
+      `"${(a.studentName || '').replace(/"/g, '""')}"`,
+      `"${(a.parentName || '').replace(/"/g, '""')}"`,
+      `"${(a.phone || '').replace(/"/g, '""')}"`,
+      `"${(a.email || '').replace(/"/g, '""')}"`,
       `"${a.targetClass}"`,
-      `"${a.subjects}"`,
-      `"${a.schoolName || ''}"`,
-      `"${a.previousPercentage || ''}"`,
-      `"${a.preferredBatch || ''}"`,
+      `"${(a.subjects || '').replace(/"/g, '""')}"`,
+      `"${(a.schoolName || '').replace(/"/g, '""')}"`,
+      `"${(a.previousPercentage || '').replace(/"/g, '""')}"`,
+      `"${(a.preferredBatch || '').replace(/"/g, '""')}"`,
       `"${a.status}"`,
-      `"${a.staffNotes || ''}"`,
-      `"${a.createdAt}"`,
+      `"${(a.staffNotes || '').replace(/"/g, '""')}"`,
+      `"${formatDateTime(a.createdAt)}"`,
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `ab_tutorials_admissions_${selectedClass}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.href = url;
+    link.download = `ab_tutorials_admissions_${selectedClass}_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -37,6 +37,7 @@ export default function AdminLayout({
     { name: 'Admissions (8th-10th)', href: '/admin/admissions', icon: <Users className="w-4 h-4" /> },
     { name: 'Student Test Results', href: '/admin/results', icon: <Award className="w-4 h-4" /> },
     { name: 'Test & Question Builder', href: '/admin/tests', icon: <BookOpen className="w-4 h-4" /> },
+    { name: 'Top Results (Hall of Fame)', href: '/admin/top-results', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
     { name: 'Student Roster', href: '/admin/students', icon: <UserCheck className="w-4 h-4" /> },
     { name: 'Inquiries & Messages', href: '/admin/messages', icon: <MessageSquare className="w-4 h-4" /> },
   ];

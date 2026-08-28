@@ -26,6 +26,22 @@ export default function HomePage() {
   const [activeQuizIndex, setActiveQuizIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [topResults, setTopResults] = useState<any[]>([
+    { id: '1', studentName: 'Rahul', class: '10th', percentage: '95%', score: 'Improved from 60% to 95%', rank: 'Class 10th Board Topper' },
+    { id: '2', studentName: 'Sneha', class: '10th', percentage: '92%', score: 'Concepts became very easy', rank: 'Board Distinction' },
+    { id: '3', studentName: 'Amit', class: '10th', percentage: '90%', score: 'Weekly tests helped a lot', rank: 'Top Scorer in Science' },
+  ]);
+
+  React.useEffect(() => {
+    fetch('/api/top-results?featured=true')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data && data.data.length > 0) {
+          setTopResults(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Quick concept questions
   const sampleQuestions = [
@@ -369,7 +385,7 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================= */}
-      {/* 5. TOP BOARD RESULTS (FROM OLD WEBSITE)                   */}
+      {/* 5. TOP BOARD RESULTS (DYNAMICALLY MANAGED THROUGH DB)     */}
       {/* ========================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10">
@@ -380,39 +396,62 @@ export default function HomePage() {
             Our Top Results
           </h2>
           <p className="text-slate-600 mt-2 text-sm sm:text-base">
-            Consistent top percentages achieved by our Class 10 students under Prof. Akshay Bora's mentorship.
+            Consistent top percentages achieved by our students under Prof. Akshay Bora's mentorship.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          
-          <div className="bg-white p-8 rounded-3xl border-2 border-emerald-200 shadow-lg text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-              <Award className="w-6 h-6" />
-            </div>
-            <div className="text-4xl sm:text-5xl font-black text-emerald-600">95%</div>
-            <h4 className="text-lg font-bold text-slate-900">Rahul</h4>
-            <p className="text-xs text-slate-500">Class 10th Board • Improved from 60% to 95%</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {topResults.map((item) => (
+            <div 
+              key={item.id} 
+              className="bg-white p-7 rounded-3xl border-2 border-emerald-200/80 shadow-md hover:shadow-xl transition-all text-center space-y-3 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Class {item.class}
+                  </span>
+                  {item.year && (
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {item.year}
+                    </span>
+                  )}
+                </div>
 
-          <div className="bg-white p-8 rounded-3xl border-2 border-emerald-200 shadow-lg text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-              <Award className="w-6 h-6" />
-            </div>
-            <div className="text-4xl sm:text-5xl font-black text-emerald-600">92%</div>
-            <h4 className="text-lg font-bold text-slate-900">Sneha</h4>
-            <p className="text-xs text-slate-500">Class 10th Board • Concepts became very easy</p>
-          </div>
+                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mt-1">
+                  <Award className="w-6 h-6" />
+                </div>
 
-          <div className="bg-white p-8 rounded-3xl border-2 border-emerald-200 shadow-lg text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-              <Award className="w-6 h-6" />
-            </div>
-            <div className="text-4xl sm:text-5xl font-black text-emerald-600">90%</div>
-            <h4 className="text-lg font-bold text-slate-900">Amit</h4>
-            <p className="text-xs text-slate-500">Class 10th Board • Weekly tests helped a lot</p>
-          </div>
+                <div className="text-4xl sm:text-5xl font-black text-emerald-600 tracking-tight mt-3">
+                  {item.percentage}
+                </div>
 
+                <h4 className="text-lg font-bold text-slate-900 mt-1">{item.studentName}</h4>
+                
+                {item.rank && (
+                  <div className="text-xs font-bold text-amber-600">
+                    {item.rank}
+                  </div>
+                )}
+
+                <p className="text-xs text-slate-500 mt-1">
+                  {item.score || `Class ${item.class} Board Achiever`}
+                </p>
+
+                {item.testimonial && (
+                  <p className="text-[11px] text-slate-500 italic mt-2.5 pt-2.5 border-t border-slate-100 line-clamp-2">
+                    "{item.testimonial}"
+                  </p>
+                )}
+              </div>
+
+              {item.schoolName && (
+                <div className="text-[10px] text-slate-400 pt-2 border-t border-slate-100">
+                  {item.schoolName}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 

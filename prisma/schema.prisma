@@ -27,7 +27,7 @@ model Student {
   parentName  String?
   parentPhone String?
   address     String?
-  pin         String   @default("1234") // Simple 4-digit PIN for quick student login
+  pin         String   @default("1234") // Simple 4-digit PIN for student login
   status      String   @default("Active") // "Active", "Inactive"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -110,4 +110,22 @@ model ContactMessage {
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model TopResult {
+  id          String   @id @default(cuid())
+  studentName String
+  class       String   // "10th", "9th", "8th"
+  percentage  String   // e.g. "95%", "92%", "90%"
+  score       String?  // e.g. "Improved from 60% to 95%", "100/100 Science"
+  schoolName  String?  // e.g. "SYCV Rajuri"
+  year        String   @default("2024-25")
+  subject     String   @default("Mathematics & Science")
+  rank        String?  // e.g. "1st in Rajuri", "Board Distinction"
+  testimonial String?
+  photoUrl    String?
+  isFeatured  Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

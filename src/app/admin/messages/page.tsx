@@ -9,7 +9,8 @@ import {
   CheckCircle2, 
   Clock, 
   Trash2,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 
@@ -54,14 +55,40 @@ export default function AdminMessagesPage() {
     }
   };
 
+  const exportToCSV = () => {
+    if (messages.length === 0) return alert('No messages to export.');
+
+    const headers = ['ID', 'Name', 'Phone', 'Email', 'Subject', 'Message', 'Status', 'Date'];
+    const rows = messages.map((m) => [
+      m.id,
+      `"${(m.name || '').replace(/"/g, '""')}"`,
+      `"${(m.phone || '').replace(/"/g, '""')}"`,
+      `"${(m.email || '').replace(/"/g, '""')}"`,
+      `"${(m.subject || '').replace(/"/g, '""')}"`,
+      `"${(m.message || '').replace(/"/g, '""')}"`,
+      m.isRead ? 'RESOLVED' : 'UNREAD',
+      `"${formatDateTime(m.createdAt)}"`,
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ab_tutorials_messages_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
               Website Inquiries & Messages
             </h1>
             <span className="bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-bold px-2.5 py-0.5 rounded-full">
@@ -72,6 +99,14 @@ export default function AdminMessagesPage() {
             General questions and feedback submitted via the public Contact page.
           </p>
         </div>
+
+        <button
+          onClick={exportToCSV}
+          className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700 flex items-center gap-2 cursor-pointer"
+        >
+          <Download className="w-4 h-4" />
+          <span>Export CSV</span>
+        </button>
       </div>
 
       {/* Messages List */}
